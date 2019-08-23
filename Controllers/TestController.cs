@@ -18,6 +18,7 @@ namespace JsonBody.Controllers
         }
 
         [HttpPost]
+        [AddDefaultContentType ("application/json")]
         [Route ("demo")]
         public IActionResult Demo([FromBody] JObject x)
         {

@@ -14,11 +14,13 @@ namespace JsonBody.Middlewares
         
         public async Task InvokeAsync(HttpContext context)
         {
-            if ((context.Request.Method == "POST") &&
-                (context.Request.Headers.ContainsKey ("Content-Type") == false))
+            var request = context.Request;
+            
+            if ((request.Method == "POST") &&
+                (request.Headers.ContainsKey ("Content-Type") == false))
             {
                 //  No Content-Type found for this request...
-                context.Request.Headers.Add ("Content-Type", new Microsoft.Extensions.Primitives.StringValues ("application/json"));
+                request.Headers.Add ("Content-Type", new Microsoft.Extensions.Primitives.StringValues ("application/json"));
             }
 
             await this.next (context);

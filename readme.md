@@ -70,3 +70,35 @@ public async Task InvokeAsync(HttpContext context)
     await this.next (context);
 }
 ```
+
+## Injecting `Content-Type` with a resource filter
+
+Another solution to inject a default content type is the resource filter;
+it can be provided as an implemention of `IAsyncResourceFilter` in an
+_attribute class_, which can then be used to decorate the action methods
+where the specific behavior is required:
+
+```cs
+[AttributeUsage (AttributeTargets.Method | AttributeTargets.Class)]
+public class AddDefaultContentTypeAttribute : System.Attribute, IAsyncResourceFilter
+{
+  public AddDefaultContentTypeAttribute(string contentType) { ... }
+  public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next) { ... }
+}
+```
+
+The action method (or the whole controller class) can then be decorated
+with an `[AddDefaultContentType]` attribute:
+
+```cs
+[HttpPost]
+[AddDefaultContentType ("application/json")]
+public IActionResult Demo([FromBody] JObject x)
+{
+  // ...
+}
+```
+
+This provides more flexibility than the middleware and does not impact every
+request coming in through the pipeline, as would be the case with the first
+solution (middleware).
