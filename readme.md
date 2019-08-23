@@ -22,13 +22,13 @@ curl --data "{}" --header "Content-Type: application/json" -X POST http://localh
 
 ## POST without `Content-Type` header
 
-Without the `Content-Type` header, this does not work:
+Without the `Content-Type` header, this would not work:
 
 ```cmd
 curl --data "{}" --header "Content-Type:" -X POST http://localhost:5000/test/demo
 ```
 
-AspNetCore returns this instead of `200 OK`:
+By default, AspNetCore returns this error:
 
 ```json
 {
@@ -36,5 +36,37 @@ AspNetCore returns this instead of `200 OK`:
   "title": "Unsupported Media Type",
   "status": 415,
   "traceId": "|c74b9116-4d2a19eef496c2f3."
+}
+```
+
+## Injecting `Content-Type` with a middleware
+
+It is straightforward with ASP.NET Core to add a dedicated middleware:
+
+```cs
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+  // ...
+  app.UseMiddleware<AddDefaultContentTypeMiddleware> ();
+  // ...
+}
+```
+
+The middleware itself is implemented in `Middlewares/AddDefaultContentTypeMiddleware.cs`.
+
+Basically, all you have to do is implement a constructor
+and a method named `InvokeAsync()`:
+
+```cs
+public async Task InvokeAsync(HttpContext context)
+{
+    if ((context.Request.Method == "POST") &&
+        (context.Request.Headers.ContainsKey ("Content-Type") == false))
+    {
+        //  No Content-Type found for this request...
+        context.Request.Headers.Add ("Content-Type", new Microsoft.Extensions.Primitives.StringValues ("application/json"));
+    }
+
+    await this.next (context);
 }
 ```
