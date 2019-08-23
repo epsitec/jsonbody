@@ -22,7 +22,7 @@ namespace JsonBody.Controllers
         public IActionResult Demo([FromBody] JObject x)
         {
             System.Console.WriteLine (x.ToString ());
-            return this.Ok ();
+            return this.Ok (x.ToString ());
         }
 
         [HttpPost]

@@ -35,6 +35,8 @@ namespace JsonBody
                 app.UseDeveloperExceptionPage ();
             }
 
+            app.UseMiddleware<Middlewares.AddDefaultContentTypeMiddleware> ();
+
             app.UseRouting ();
 
             app.UseEndpoints (endpoints =>
